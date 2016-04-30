@@ -1,0 +1,82 @@
+#!/bin/sh
+. /etc/init.d/functions
+
+. /etc/jelastic/environment
+
+prog="glassfish"
+
+GLASSFISH_HOME=${GLASSFISH_HOME:-"/opt/repo/versions/${Version}/"}
+
+start() {
+        echo  $"Starting $prog: "
+        if [ -e /opt/repo/lock/glassfish ]; then
+            if [ -e /opt/repo/pid/glassfish.pid ] && [ -e /proc/`cat /opt/repo/pid/glassfish.pid` ]; then
+                echo -n $"cannot start glassfish: glassfish is already running.";
+                failure $"cannot start glassfish: glassfish already running.";
+                echo
+                return 1
+            fi
+        fi;
+        memory_total=`free -m | grep Mem | awk '{print $2}'`;
+        [ -z "$XMX" ] && { let XMX=memory_total-35; }
+        sed -i "s/-Xmx[0-9]*m/-Xmx${XMX}m/g" "/opt/repo/versions/${Version}/glassfish/domains/domain1/config/domain.xml";
+        $GLASSFISH_HOME/bin/asadmin start-domain domain1
+        RETVAL=$?
+        PID=$(pgrep -f glassfish.jar)
+        echo
+        [ $RETVAL -eq 0 ] && touch /opt/repo/lock/glassfish && echo $PID > /opt/repo/pid/glassfish.pid;
+        return $RETVAL
+}
+
+stop() {
+        echo  $"Stopping $prog: "
+        if [ ! -e /opt/repo/lock/glassfish ]; then
+            echo -n $"cannot stop glassfish: glassfish is not running."
+            failure $"cannot stop glassfish: glassfish is not running."
+            echo
+            return 1;
+        fi
+        $GLASSFISH_HOME/bin/asadmin stop-domain domain1
+        RETVAL=$?
+        echo
+        [ $RETVAL -eq 0 ] && rm -f /opt/repo/lock/glassfish && rm /opt/repo/pid/glassfish.pid;
+        return $RETVAL
+}
+
+status() {
+	if [ -f /opt/repo/pid/glassfish.pid ]; then
+		local glasfpid=`cat /opt/repo/pid/glassfish.pid`;
+		local runproc=`ps aux | grep $glasfpid | grep java |grep -v grep` 
+		if [ -n "$runproc" ]; then
+			echo "Glassfish server is running on pid $glasfpid";
+		else 
+			echo "Glassfish server is not running" 
+		fi;
+	else
+		echo "Glassfish server is not running"
+	fi
+}
+
+case "$1" in
+start)
+    start
+    ;;
+stop)
+    stop
+    ;;
+restart|reload)
+    stop
+    start
+    ;;
+build)
+    echo 
+    ;;
+deploy)
+    echo
+    ;;
+status)
+    status
+    ;;
+*)
+    echo "usage: $0 (start|stop|restart|reload|status)"
+esac
