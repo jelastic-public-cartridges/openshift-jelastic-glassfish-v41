@@ -8,6 +8,7 @@ prog="glassfish"
 GLASSFISH_HOME=${GLASSFISH_HOME:-"/opt/repo/versions/${Version}/"}
 
 start() {
+        source /opt/repo/versions/${Version}/bin/memoryConfig.sh
         echo  $"Starting $prog: "
         if [ -e /opt/repo/lock/glassfish ]; then
             if [ -e /opt/repo/pid/glassfish.pid ] && [ -e /proc/`cat /opt/repo/pid/glassfish.pid` ]; then
@@ -17,9 +18,9 @@ start() {
                 return 1
             fi
         fi;
-        memory_total=`free -m | grep Mem | awk '{print $2}'`;
-        [ -z "$XMX" ] && { let XMX=memory_total-35; }
-        sed -i "s/-Xmx[0-9]*m/-Xmx${XMX}m/g" "/opt/repo/versions/${Version}/glassfish/domains/domain1/config/domain.xml";
+        sed -i "s/-Xmx[0-9a-zmM]*/-Xmx${XMX_VALUE}M/g" /opt/repo/versions/${Version}/glassfish/domains/domain1/config/domain.xml;
+        sed -i "/-XX:MaxPermSize=/d" /opt/repo/versions/${Version}/glassfish/domains/domain1/config/domain.xml;
+        [ -n "${MAXPERMSIZE}" ] && sed -i "/<java-config.*/a  <jvm-options>${MAXPERMSIZE}</jvm-options>" /opt/repo/versions/${Version}/glassfish/domains/domain1/config/domain.xml;
         $GLASSFISH_HOME/bin/asadmin start-domain domain1
         RETVAL=$?
         PID=$(pgrep -f glassfish.jar)
@@ -44,17 +45,17 @@ stop() {
 }
 
 status() {
-	if [ -f /opt/repo/pid/glassfish.pid ]; then
-		local glasfpid=`cat /opt/repo/pid/glassfish.pid`;
-		local runproc=`ps aux | grep $glasfpid | grep java |grep -v grep` 
-		if [ -n "$runproc" ]; then
-			echo "Glassfish server is running on pid $glasfpid";
-		else 
-			echo "Glassfish server is not running" 
-		fi;
-	else
-		echo "Glassfish server is not running"
-	fi
+        if [ -f /opt/repo/pid/glassfish.pid ]; then
+                local glasfpid=`cat /opt/repo/pid/glassfish.pid`;
+                local runproc=`ps aux | grep $glasfpid | grep java |grep -v grep` 
+                if [ -n "$runproc" ]; then
+                        echo "Glassfish server is running on pid $glasfpid";
+                else 
+                        echo "Glassfish server is not running" 
+                fi;
+        else
+                echo "Glassfish server is not running"
+        fi
 }
 
 case "$1" in
@@ -80,3 +81,4 @@ status)
 *)
     echo "usage: $0 (start|stop|restart|reload|status)"
 esac
+
