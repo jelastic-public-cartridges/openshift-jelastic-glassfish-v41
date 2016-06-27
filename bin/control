@@ -18,7 +18,11 @@ start() {
                 return 1
             fi
         fi;
-        sed -i "s/-Xmx[0-9a-zmM]*/-Xmx${XMX_VALUE}M/g" /opt/repo/versions/${Version}/glassfish/domains/domain1/config/domain.xml;
+	sed -i "s/-Xmx[0-9a-zmM]*/-Xmx${XMX_VALUE}M/g" /opt/repo/versions/${Version}/glassfish/domains/domain1/config/domain.xml;
+        sed -i "s/-Xms[0-9a-zmM]*/${XMS}/g" /opt/repo/versions/${Version}/glassfish/domains/domain1/config/domain.xml;
+        sed -i "s/-Xmn[0-9a-zmM]*/${XMN}/g" /opt/repo/versions/${Version}/glassfish/domains/domain1/config/domain.xml;
+        sed -i "s/-Xminf[0-9.]*/${XMINF}/g" /opt/repo/versions/${Version}/glassfish/domains/domain1/config/domain.xml;
+        sed -i "s/-Xmaxf[0-9.]*/${XMAXF}/g" /opt/repo/versions/${Version}/glassfish/domains/domain1/config/domain.xml;
         sed -i "/-XX:MaxPermSize=/d" /opt/repo/versions/${Version}/glassfish/domains/domain1/config/domain.xml;
         [ -n "${MAXPERMSIZE}" ] && sed -i "/<java-config.*/a  <jvm-options>${MAXPERMSIZE}</jvm-options>" /opt/repo/versions/${Version}/glassfish/domains/domain1/config/domain.xml;
         $GLASSFISH_HOME/bin/asadmin start-domain domain1
