@@ -22,4 +22,5 @@ function _setPassword() {
         $AS_ADMIN -u admin -W "/tmp/$$" enable-secure-admin > /dev/null 2>&1;
         service cartridge restart > /dev/null 2>&1;        
         rm "/tmp/$$" 2>&1;
+        [ -e /opt/repo/.gfpass ] && rm -f /opt/repo/.gfpass;
 }
