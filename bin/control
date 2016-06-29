@@ -8,7 +8,7 @@ prog="glassfish"
 GLASSFISH_HOME=${GLASSFISH_HOME:-"/opt/repo/versions/${Version}/"}
 
 start() {
-        source /opt/repo/versions/${Version}/bin/memoryConfig.sh
+        source /opt/repo/versions/${Version}/bin/variablesparser.sh
         echo  $"Starting $prog: "
         if [ -e /opt/repo/lock/glassfish ]; then
             if [ -e /opt/repo/pid/glassfish.pid ] && [ -e /proc/`cat /opt/repo/pid/glassfish.pid` ]; then
@@ -18,11 +18,12 @@ start() {
                 return 1
             fi
         fi;
-	sed -i "s/-Xmx[0-9a-zmM]*/-Xmx${XMX_VALUE}M/g" /opt/repo/versions/${Version}/glassfish/domains/domain1/config/domain.xml;
-        sed -i "s/-Xms[0-9a-zmM]*/${XMS}/g" /opt/repo/versions/${Version}/glassfish/domains/domain1/config/domain.xml;
-        sed -i "s/-Xmn[0-9a-zmM]*/${XMN}/g" /opt/repo/versions/${Version}/glassfish/domains/domain1/config/domain.xml;
-        sed -i "s/-Xminf[0-9.]*/${XMINF}/g" /opt/repo/versions/${Version}/glassfish/domains/domain1/config/domain.xml;
-        sed -i "s/-Xmaxf[0-9.]*/${XMAXF}/g" /opt/repo/versions/${Version}/glassfish/domains/domain1/config/domain.xml;
+	[ -n "${XMX_VALUE}" ] && sed -i "s/-Xmx[0-9a-zmM]*/-Xmx${XMX_VALUE}M/g" /opt/repo/versions/${Version}/glassfish/domains/domain1/config/domain.xml;
+        [ -n "${XMS}" ] && sed -i "s/-Xms[0-9a-zmM]*/${XMS}/g" /opt/repo/versions/${Version}/glassfish/domains/domain1/config/domain.xml;
+        [ -n "${XMN}" ] && sed -i "s/-Xmn[0-9a-zmM]*/${XMN}/g" /opt/repo/versions/${Version}/glassfish/domains/domain1/config/domain.xml;
+        [ -n "${XMINF}" ] && sed -i "s/-Xminf[0-9.]*/${XMINF}/g" /opt/repo/versions/${Version}/glassfish/domains/domain1/config/domain.xml;
+        [ -n "${XMAXF}" ] && sed -i "s/-Xmaxf[0-9.]*/${XMAXF}/g" /opt/repo/versions/${Version}/glassfish/domains/domain1/config/domain.xml;
+        [ -n "${GC}" ] && sed -i "s/-XX:+Use.*GC/${GC}/g" /opt/repo/versions/${Version}/glassfish/domains/domain1/config/domain.xml;
         sed -i "/-XX:MaxPermSize=/d" /opt/repo/versions/${Version}/glassfish/domains/domain1/config/domain.xml;
         [ -n "${MAXPERMSIZE}" ] && sed -i "/<java-config.*/a  <jvm-options>${MAXPERMSIZE}</jvm-options>" /opt/repo/versions/${Version}/glassfish/domains/domain1/config/domain.xml;
         $GLASSFISH_HOME/bin/asadmin start-domain domain1

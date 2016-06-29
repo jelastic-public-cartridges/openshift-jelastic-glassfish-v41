@@ -223,6 +223,7 @@
         <jvm-options>-Xmx1638M</jvm-options>
         <jvm-options>-Xminf0.1</jvm-options>
         <jvm-options>-Xmaxf0.3</jvm-options>
+	<jvm-options>-XX:+UseParNewGC</jvm-options>
         <jvm-options>-Djavax.net.ssl.keyStore=${com.sun.aas.instanceRoot}/config/keystore.jks</jvm-options>
         <jvm-options>-Djavax.net.ssl.trustStore=${com.sun.aas.instanceRoot}/config/cacerts.jks</jvm-options>
         <jvm-options>-Djava.ext.dirs=${com.sun.aas.javaRoot}/lib/ext${path.separator}${com.sun.aas.javaRoot}/jre/lib/ext${path.separator}${com.sun.aas.instanceRoot}/lib/ext</jvm-options>
@@ -420,6 +421,7 @@
         <jvm-options>-Xmx1638M</jvm-options>
         <jvm-options>-Xminf0.1</jvm-options>
         <jvm-options>-Xmaxf0.3</jvm-options>
+	<jvm-options>-XX:+UseParNewGC</jvm-options>
         <jvm-options>-Dorg.glassfish.additionalOSGiBundlesToStart=org.apache.felix.shell,org.apache.felix.gogo.runtime,org.apache.felix.gogo.shell,org.apache.felix.gogo.command,org.apache.felix.fileinstall</jvm-options>
         <jvm-options>-Dosgi.shell.telnet.port=${OSGI_SHELL_TELNET_PORT}</jvm-options>
         <jvm-options>-Dosgi.shell.telnet.maxconn=1</jvm-options>
