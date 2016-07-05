@@ -17,7 +17,9 @@ function _runAsadminCmd(){
                 echo -n "AS_ADMIN_PASSWORD=" > $temp_file;
                 cat $PASS_FILE >> $temp_file;
                 $AS_ADMIN -u $ADMIN_USER -W $temp_file $cmd >> $ACTIONS_LOG 2>&1;
+                local result=$?;
                 rm $temp_file;
+                return $result;
         } || { $AS_ADMIN $cmd > /dev/null 2>&1; };
 }
 
