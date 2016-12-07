@@ -14,7 +14,6 @@ sed -i 's/--target gfcluster//g' $LEGACY_LIB;
 
 function _enableSSL(){
    enableSSL $@
-   serviceRestartSilent "$SERVICE"  > /dev/null 2>&1;
 }
 
 function _disableSSL(){
