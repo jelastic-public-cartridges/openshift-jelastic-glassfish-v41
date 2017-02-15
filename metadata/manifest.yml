@@ -1,7 +1,7 @@
-Name: glassfish
+Name: GlassFish
 Cartridge-Short-Name: GLASSFISH4
 Display-Name: GLASSFISH4
-Description: "Jelastic Glassfish4"
+Description: "Jelastic GlassFish4"
 Version: '4.1.1'
 License: 'Common Development and Distribution License and GNU General Public License'
 Vendor: 'Oracle'   
@@ -31,7 +31,7 @@ Cart-Data:
     Type: environment
     Description: "Unique ID which identified the gear. This value changes between gears."
 Provides:
-  - tomcat8
+  - GlassFish
 Scaling:
   Min: 1
   Max: 1
