@@ -2,7 +2,7 @@ Name: GlassFish
 Cartridge-Short-Name: GLASSFISH4
 Display-Name: GLASSFISH4
 Description: "Jelastic GlassFish4"
-Version: '4.1.1'
+Version: '4.1.2'
 License: 'Common Development and Distribution License and GNU General Public License'
 Vendor: 'Oracle'   
 Cartridge-Version: 1.0.0
