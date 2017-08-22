@@ -16,5 +16,7 @@ fi
 
 [ -f "/opt/repo/.bash_profile" ] && cp /opt/repo/.bash_profile /opt/repo/home/
 
+echo 'export PATH=${PATH}:/opt/repo/versions/4.1.2/bin' >> /opt/repo/home/.bash_profile
+
 [ -d "/opt/repo/logs" ] && rmdir /opt/repo/logs
 ln -s /opt/repo/versions/${Version}/glassfish/domains/domain1/logs /opt/repo/logs
