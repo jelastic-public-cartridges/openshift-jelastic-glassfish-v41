@@ -34,15 +34,18 @@ function ensureFileCanBeDownloaded(){
 
 function getPackageName() {
     if [ -f "$package_url" ]; then
-        package_name="$package_url";
+        package_name=$(basename "${package_url}")
+        package_path=$(dirname "${package_url}")
     elif [[ "${package_url}" =~ file://* ]]; then
-        package_name="${package_url:7}"
-        [ -f "$package_name" ] || { writeJSONResponseErr "result=>4078" "message=>Error loading file from URL"; die -q; }
+        package_name=$(basename "${package_url:7}")
+        package_path=$(dirname "${package_url:7}")
+        [ -f "${package_path}/${package_name}" ] || { writeJSONResponseErr "result=>4078" "message=>Error loading file from URL"; die -q; }
     else
         ensureFileCanBeDownloaded $package_url;
-        $WGET --no-check-certificate --content-disposition --directory-prefix="$download_dir" $package_url >> $ACTIONS_LOG 2>&1 || { writeJSONResponseErr "result=>4078" "message=>Error loading file from URL"; die -q; }
-        package_name="${download_dir}/$(ls ${download_dir})";
-        [ ! -s "$package_name" ] && {
+        $WGET --no-check-certificate --content-disposition --directory-prefix="${download_dir}" $package_url >> $ACTIONS_LOG 2>&1 || { writeJSONResponseErr "result=>4078" "message=>Error loading file from URL"; die -q; }
+        package_name="$(ls ${download_dir})";
+        package_path=${download_dir};
+        [ ! -s "${package_path}/${package_name}" ] && {
             set -f
             rm -f "${package_name}";
             set +f
@@ -53,19 +56,36 @@ function getPackageName() {
 }
 
 function _deploy(){
+     [ ! -d "$DOWNLOADS" ] && { mkdir -p "$DOWNLOADS"; }
+     _clearCache;
      [ -f "${WEBROOT}/${context}.war" ] &&  rm -f "${WEBROOT}/${context}.war";
+     mkdir -p ${DOWNLOADS};
+     deployDir="${DOWNLOADS}";
      download_dir=$(mktemp -d)
      getPackageName
      echo $package_name | $GREP -qP "ear$" && ext="ear" || ext="war";
      [ "x${context}" == "xROOT" ] && deploy_context="/" || deploy_context=$context;
-     [[ -f "${package_name}" && "${context}.${ext}" != "${package_name}" ]] && cp -f "${package_name}" "/tmp/${context}.${ext}";
-     _runAsadminCmd  deploy --force=true --contextroot "$deploy_context" "/tmp/${context}.${ext}" >> $ACTIONS_LOG 2>&1;
+     if [[ "${context}.${ext}" != "${package_name}" ]] ; then
+         /bin/cp -f "${package_path}/${package_name}" "${DOWNLOADS}/${context}.${ext}"; 
+     else
+         [[ "${package_path}" != "${DOWNLOADS}" ]] && deployDir="${package_path}"
+     fi
+     _runAsadminCmd  deploy --force=true --contextroot "$deploy_context" "${deployDir}/${context}.${ext}" #>> $ACTIONS_LOG 2>&1;
      local result=$?;
      rm -rf ${download_dir};
-     [ -f "/tmp/${context}.${ext}" ] && rm -f "/tmp/${context}.${ext}"
+     #_clearCache;
      return $result;
 }
 
 function _undeploy(){
      _runAsadminCmd  undeploy "$context"  >> $ACTIONS_LOG 2>&1;
+}
+
+function _clearCache(){
+    if [[ -d "$DOWNLOADS" ]]
+    then
+       shopt -s dotglob;
+       rm -Rf ${DOWNLOADS}/*;
+       shopt -u dotglob;
+    fi
 }
