@@ -73,7 +73,7 @@ function _deploy(){
      _runAsadminCmd  deploy --force=true --contextroot "$deploy_context" "${deployDir}/${context}.${ext}" #>> $ACTIONS_LOG 2>&1;
      local result=$?;
      rm -rf ${download_dir};
-     #_clearCache;
+     _clearCache;
      return $result;
 }
 
