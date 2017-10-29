@@ -28,3 +28,10 @@ JAVABIN=$(which java 2>/dev/null)
 [ ! -z "$JAVABIN" ] && {
     setcap 'cap_net_bind_service=+ep' $(readlink -f "$JAVABIN")
 }
+
+JAVA_BINARIES=$(find /usr/java/* -name java) 
+
+for i in ${JAVA_BINARIES}
+do
+     setcap 'cap_net_bind_service=+ep' ${i}
+done
