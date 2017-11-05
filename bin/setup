@@ -21,8 +21,8 @@ echo 'export PATH=${PATH}:/opt/repo/versions/4.1.2/bin' >> /opt/repo/home/.bash_
 [ -d "/opt/repo/logs" ] && rmdir /opt/repo/logs
 ln -s /opt/repo/versions/${Version}/glassfish/domains/domain1/logs /opt/repo/logs
 
-echo -e "$(find /usr -name libjli.so -printf "%h\n")" > /etc/ld.so.conf.d/java.conf ; \
-ldconfig
+#echo -e "$(find /usr -name libjli.so -printf "%h\n")" > /etc/ld.so.conf.d/java.conf ; \
+#ldconfig
 
 JAVABIN=$(which java 2>/dev/null)
 [ ! -z "$JAVABIN" ] && {
