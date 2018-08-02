@@ -62,6 +62,7 @@ function _deploy(){
      mkdir -p ${DOWNLOADS};
      deployDir="${DOWNLOADS}";
      download_dir=$(mktemp -d)
+     chmod a+rwx ${download_dir} &>/dev/null
      getPackageName
      echo $package_name | $GREP -qP "ear$" && ext="ear" || ext="war";
      [ "x${context}" == "xROOT" ] && deploy_context="/" || deploy_context=$context;
